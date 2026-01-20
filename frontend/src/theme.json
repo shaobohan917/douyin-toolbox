@@ -1,0 +1,16 @@
+{
+  "light": {
+    "navigationBarBackgroundColor": "#FF2E4D",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "Douyin Toolbox",
+    "backgroundColor": "#F8F8F8",
+    "backgroundTextStyle": "dark"
+  },
+  "dark": {
+    "navigationBarBackgroundColor": "#1A1A1A",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "Douyin Toolbox",
+    "backgroundColor": "#121212",
+    "backgroundTextStyle": "light"
+  }
+}

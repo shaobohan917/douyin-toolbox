@@ -1,0 +1,18 @@
+{
+  "name": "douyin-mcp-server",
+  "version": "1.0.0",
+  "description": "Douyin MCP Server for parsing and processing Douyin content",
+  "main": "server.py",
+  "scripts": {
+    "start": "python server.py",
+    "dev": "python -m uvicorn server:app --reload"
+  },
+  "dependencies": {
+    "fastapi==0.104.1",
+    "uvicorn==0.24.0",
+    "httpx==0.25.2",
+    "beautifulsoup4==4.12.2",
+    "lxml==4.9.3",
+    "python-multipart==0.0.6"
+  }
+}

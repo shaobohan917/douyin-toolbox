@@ -1,0 +1,34 @@
+{
+  "name": "douyin-toolbox",
+  "version": "1.0.0",
+  "description": "A cross-platform app for parsing Douyin links, getting watermark-free video URLs, and extracting video text using AI",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:mcp\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:backend:stt": "export DASHSCOPE_API_KEY=$(cat .env 2>/dev/null | grep DASHSCOPE_API_KEY | cut -d'=' -f2) && cd backend && node src/app.js",
+    "dev:frontend": "cd frontend && ./node_modules/.bin/vite --port 8080",
+    "dev:mcp": "./scripts/start-mcp.sh",
+    "dev:frontend:mp": "cd frontend && npm run dev:mp-weixin",
+    "dev:frontend:app": "cd frontend && npm run dev:app-plus",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "install:python": "./scripts/start-mcp.sh --install",
+    "start": "cd backend && npm start",
+    "start:stt": "export DASHSCOPE_API_KEY=$(cat .env 2>/dev/null | grep DASHSCOPE_API_KEY | cut -d'=' -f2) && cd backend && node src/app.js",
+    "stop": "pkill -f 'node.*backend' && pkill -f 'vite' && pkill -f 'uvicorn.*server' && pkill -f 'python.*server'",
+    "restart": "npm run stop && npm run dev",
+    "clean": "rm -rf backend/node_modules frontend/node_modules douyin-mcp-server/.venv",
+    "status": "echo 'Checking services...' && lsof -i :3000 2>/dev/null | grep LISTEN && echo 'Backend: Running on http://localhost:3000' || echo 'Backend: Stopped' && lsof -i :8080 2>/dev/null | grep LISTEN && echo 'Frontend: Running on http://localhost:8080' || echo 'Frontend: Stopped' && lsof -i :8000 2>/dev/null | grep LISTEN && echo 'MCP: Running on http://localhost:8000' || echo 'MCP: Stopped'"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "douyin",
+    "video",
+    "parser",
+    "watermark-removal",
+    "mcp"
+  ],
+  "author": "Douyin Toolbox",
+  "license": "MIT"
+}

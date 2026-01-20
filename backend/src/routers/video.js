@@ -1,0 +1,46 @@
+const Router = require('koa-router');
+const videoController = require('../controllers/video');
+
+const router = new Router({ prefix: '/api/video' });
+
+router.post('/parse', async (ctx) => {
+  const { url } = ctx.request.body;
+  if (!url) {
+    ctx.status = 400;
+    ctx.body = { success: false, message: 'URL is required', data: null };
+    return;
+  }
+  await videoController.parseVideo(ctx, url);
+});
+
+router.post('/download', async (ctx) => {
+  const { url, filename } = ctx.request.body;
+  if (!url) {
+    ctx.status = 400;
+    ctx.body = { success: false, message: 'URL is required', data: null };
+    return;
+  }
+  await videoController.downloadVideo(ctx, url, filename);
+});
+
+router.post('/speech-to-text', async (ctx) => {
+  const { videoUrl, apiKey } = ctx.request.body;
+  if (!videoUrl) {
+    ctx.status = 400;
+    ctx.body = { success: false, message: 'Video URL is required', data: null };
+    return;
+  }
+  await videoController.extractText(ctx, videoUrl, apiKey);
+});
+
+router.get('/proxy-download', async (ctx) => {
+  const { url } = ctx.query;
+  if (!url) {
+    ctx.status = 400;
+    ctx.body = { success: false, message: 'URL is required', data: null };
+    return;
+  }
+  await videoController.proxyDownload(ctx, url);
+});
+
+module.exports = router;

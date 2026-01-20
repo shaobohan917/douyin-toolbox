@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Douyin Toolbox - 抖音工具箱</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8f9fa;
+      min-height: 100vh;
+      padding-bottom: 80px;
+      color: #333;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+      padding: 32px 20px 48px;
+      text-align: center;
+      border-radius: 0 0 30px 30px;
+      box-shadow: 0 4px 20px rgba(255, 71, 87, 0.3);
+    }
+    
+    .header h1 {
+      color: #fff;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+    
+    .header .subtitle {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
+    }
+    
+    .container {
+      max-width: 420px;
+      margin: -30px auto 0;
+      padding: 0 16px;
+    }
+    
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .input-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .input-wrapper {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .url-input {
+      flex: 1;
+      height: 48px;
+      background: #f5f5f7;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 0 16px;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    .url-input:focus {
+      border-color: #ff4757;
+      background: #fff;
+    }
+    
+    .paste-btn {
+      padding: 0 20px;
+      background: #f5f5f7;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      border: none;
+    }
+    
+    .paste-btn:active {
+      background: #e8e8eb;
+      transform: scale(0.95);
+    }
+    
+    .parse-btn {
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    }
+    
+    .parse-btn:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+    }
+    
+    .parse-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .video-card {
+      overflow: hidden;
+      display: none;
+    }
+    
+    .video-card.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .video-cover {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    .video-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .play-icon::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 20px solid #ff4757;
+      border-top: 12px solid transparent;
+      border-bottom: 12px solid transparent;
+      margin-left: 4px;
+    }
+    
+    .video-duration {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    
+    .video-info {
+      padding: 16px 0 0;
+    }
+    
+    .video-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #1a1a2e;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .author-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+    }
+    
+    .author-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    .author-name {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      padding: 16px 0;
+      border-top: 1px solid #f0f0f0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-num {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    .action-section {
+      padding-top: 16px;
+    }
+    
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .action-row:last-child {
+      margin-bottom: 0;
+    }
+    
+    .action-btn {
+      flex: 1;
+      height: 46px;
+      border-radius: 23px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    
+    .action-btn:active {
+      transform: scale(0.97);
+    }
+    
+    .action-btn.primary {
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+    }
+    
+    .action-btn.secondary {
+      background: #f5f5f7;
+      color: #333;
+    }
+    
+    .action-btn.outline {
+      background: transparent;
+      color: #ff4757;
+      border: 2px solid #ff4757;
+    }
+    
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 15px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+      max-width: 80%;
+      text-align: center;
+    }
+    
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .toast.success {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+    }
+    
+    .toast.error {
+      background: linear-gradient(135deg, #ff7675, #d63031);
+    }
+    
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      display: flex;
+      padding: 10px 0;
+      box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
+      z-index: 100;
+    }
+    
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #999;
+      text-decoration: none;
+      font-size: 11px;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 8px;
+      border-radius: 8px;
+    }
+    
+    .nav-item.active {
+      color: #ff4757;
+      background: rgba(255, 71, 87, 0.1);
+    }
+    
+    .nav-item .icon {
+      font-size: 22px;
+    }
+    
+    .page {
+      display: none;
+    }
+    
+    .page.active {
+      display: block;
+    }
+    
+    .page-header {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+    }
+    
+    .history-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .history-item:active {
+      background: #f0f0f0;
+    }
+    
+    .history-cover {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    
+    .history-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .history-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .history-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .history-author {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .history-time {
+      font-size: 11px;
+      color: #bbb;
+      margin-top: 4px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    
+    .page {
+      display: none;
+    }
+    
+    .page.active {
+      display: block;
+    }
+    
+    .page-home {
+      display: block;
+    }
+    
+    .page-home.active {
+      display: block;
+    }
+    
+    .stats-card {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .stats-item {
+      text-align: center;
+      padding: 12px 8px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+    
+    .stats-item .num {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ff4757;
+    }
+    
+    .stats-item .label {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .clear-btn {
+      width: 100%;
+      height: 44px;
+      background: #fff;
+      border: 2px solid #ff4757;
+      border-radius: 22px;
+      color: #ff4757;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    
+    .clear-btn:active {
+      background: #fff0f1;
+    }
+    
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+    
+    .setting-label {
+      font-size: 15px;
+      color: #333;
+    }
+    
+    .setting-desc {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .setting-input {
+      width: 200px;
+      height: 40px;
+      background: #f5f5f7;
+      border: none;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 14px;
+      text-align: right;
+      outline: none;
+    }
+    
+    .setting-input:focus {
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.2);
+    }
+    
+    .save-btn {
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 24px;
+      box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+    }
+    
+    .save-btn:active {
+      transform: scale(0.98);
+    }
+    
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    
+    .modal.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: #fff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow: hidden;
+      animation: modalIn 0.3s ease;
+    }
+    
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .modal-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      background: #f5f5f7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      color: #666;
+    }
+    
+    .modal-close:active {
+      background: #e8e8eb;
+    }
+    
+    .modal-body {
+      padding: 20px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    
+    .extracted-text {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: #333;
+      white-space: pre-wrap;
+    }
+    
+    .copy-text-btn {
+      width: 100%;
+      height: 44px;
+      background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    
+    .delete-icon {
+      color: #ff4757;
+      font-size: 18px;
+      padding: 8px;
+    }
+    
+    .action-icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+    }
+    
+    .loading-overlay.show {
+      display: flex;
+    }
+    
+    .loading-text {
+      margin-top: 16px;
+      font-size: 15px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Douyin Toolbox</h1>
+    <p class="subtitle">解析视频 · 去除水印 · AI 提取文字</p>
+  </header>
+  
+  <div class="container">
+    <div class="page page-home active">
+      <div class="input-card">
+        <div class="input-wrapper">
+          <input type="text" class="url-input" id="urlInput" placeholder="粘贴抖音分享链接..." />
+          <button class="paste-btn" id="pasteBtn">📋 粘贴</button>
+        </div>
+        <button class="parse-btn" id="parseBtn">🔍 解析视频</button>
+      </div>
+      
+      <div class="card video-card" id="videoCard">
+        <div class="video-cover">
+          <img id="videoCover" src="" alt="Video Cover" style="display:none;">
+          <div id="coverPlaceholder" style="width:100%;height:100%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;">
+            <div style="width:60px;height:60px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+              <div style="width:0;height:0;border-left:20px solid #fff;border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:4px;"></div>
+            </div>
+          </div>
+          <div class="play-icon"></div>
+          <div class="video-duration" id="videoDuration">0:00</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title" id="videoTitle">加载中...</div>
+          <div class="author-row">
+            <img class="author-avatar" id="authorAvatar" src="" style="display:none;">
+            <div id="avatarPlaceholder" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff4757,#ff6b81);"></div>
+            <div class="author-name" id="authorName">@...</div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-item">
+              <div class="stat-num" id="diggCount">-</div>
+              <div class="stat-label">点赞</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num" id="commentCount">-</div>
+              <div class="stat-label">评论</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num" id="shareCount">-</div>
+              <div class="stat-label">分享</div>
+            </div>
+          </div>
+          <div class="action-section">
+            <div class="action-row">
+              <button class="action-btn primary" id="copyLinkBtn">📋 复制链接</button>
+              <button class="action-btn secondary" id="downloadBtn">⬇️ 下载</button>
+            </div>
+            <div class="action-row">
+              <button class="action-btn outline" id="extractBtn">🤖 AI 提取文字</button>
+              <button class="action-btn outline" id="shareBtn">📤 分享</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-page="home">
+      <span class="icon">🏠</span>
+      <span>首页</span>
+    </div>
+    <div class="nav-item" data-page="history">
+      <span class="icon">📋</span>
+      <span>历史</span>
+    </div>
+    <div class="nav-item" data-page="settings">
+      <span class="icon">⚙️</span>
+      <span>设置</span>
+    </div>
+  </nav>
+  
+  <div class="toast" id="toast"></div>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner" style="width:40px;height:40px;border-width:3px;"></div>
+    <div class="loading-text" id="loadingText">处理中...</div>
+  </div>
+  
+  <div class="modal" id="textModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">提取的文字</span>
+        <div class="modal-close" id="closeTextModal">×</div>
+      </div>
+      <div class="modal-body">
+        <div class="extracted-text" id="extractedText">加载中...</div>
+        <button class="copy-text-btn" id="copyTextBtn">📋 复制文字</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000/api';
+    let currentVideoData = null;
+    let currentPage = 'home';
+    let config = { autoSaveHistory: true };
+    
+    function showToast(message, type = '') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+    
+    function showLoading(text = '处理中...') {
+      document.getElementById('loadingText').textContent = text;
+      document.getElementById('loadingOverlay').classList.add('show');
+    }
+    
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.remove('show');
+    }
+    
+    function formatNumber(num) {
+      if (num >= 100000000) return (num / 100000000).toFixed(1) + '亿';
+      if (num >= 10000) return (num / 10000).toFixed(1) + '万';
+      return num.toString();
+    }
+    
+    function formatDuration(ms) {
+      if (!ms) return '0:00';
+      const seconds = Math.floor(ms / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+    
+    function formatTime(isoString) {
+      const date = new Date(isoString);
+      const now = new Date();
+      const diff = now - date;
+      
+      if (diff < 60000) return '刚刚';
+      if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+      if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+      if (diff < 604800000) return Math.floor(diff / 86400000) + '天前';
+      
+      return date.toLocaleDateString('zh-CN');
+    }
+    
+    function switchPage(page) {
+      currentPage = page;
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      
+      const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
+      if (navItem) {
+        navItem.classList.add('active');
+      }
+      
+      let pageElement = document.querySelector(`.page-${page}`);
+      
+      if (page === 'history') {
+        if (!pageElement) {
+          pageElement = document.createElement('div');
+          pageElement.className = 'page page-history';
+          pageElement.innerHTML = `
+            <div class="card">
+              <div class="page-header">历史记录</div>
+              <div class="stats-card" id="historyStats">
+                <div class="stats-item">
+                  <div class="num" id="statsTotal">0</div>
+                  <div class="label">全部</div>
+                </div>
+                <div class="stats-item">
+                  <div class="num" id="statsToday">0</div>
+                  <div class="label">今日</div>
+                </div>
+                <div class="stats-item">
+                  <div class="num" id="statsWeek">0</div>
+                  <div class="label">本周</div>
+                </div>
+                <div class="stats-item">
+                  <div class="num" id="statsMonth">0</div>
+                  <div class="label">本月</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div id="historyList"></div>
+            </div>
+            <button class="clear-btn" id="clearHistoryBtn">🗑️ 清空历史记录</button>
+          `;
+          document.querySelector('.container').appendChild(pageElement);
+          document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+        }
+        pageElement.classList.add('active');
+        loadHistory();
+      } else if (page === 'settings') {
+        if (!pageElement) {
+          pageElement = document.createElement('div');
+          pageElement.className = 'page page-settings';
+          pageElement.innerHTML = `
+            <div class="card">
+              <div class="page-header">设置</div>
+            </div>
+            <div class="card">
+              <div class="setting-item">
+                <div>
+                  <div class="setting-label">自动保存历史</div>
+                  <div class="setting-desc">解析后自动记录到历史</div>
+                </div>
+                <input type="checkbox" id="autoSaveCheck" checked>
+              </div>
+            </div>
+            <button class="save-btn" id="saveSettingsBtn">💾 保存设置</button>
+          `;
+          document.querySelector('.container').appendChild(pageElement);
+          document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+        }
+        pageElement.classList.add('active');
+        loadSettings();
+      } else if (page === 'home') {
+        if (pageElement) {
+          pageElement.classList.add('active');
+        }
+      }
+    }
+    
+    async function loadConfig() {
+      try {
+        const res = await fetch(`${API_BASE}/config`);
+        const result = await res.json();
+        if (result.success) {
+          config = result.data;
+        }
+      } catch (e) {
+        console.error('Load config error:', e);
+      }
+    }
+    
+    async function parseVideo() {
+      const url = document.getElementById('urlInput').value.trim();
+      const parseBtn = document.getElementById('parseBtn');
+      
+      if (!url) {
+        showToast('请输入抖音链接', 'error');
+        return;
+      }
+      
+      const douyinPatterns = [
+        /douyin\.com\/share\/video\/\d+/,
+        /douyin\.com\/video\/\d+/,
+        /v\.douyin\.com\/\w+/,
+        /www\.douyin\.com\/share\/video\/\d+/,
+        /iesdouyin\.com\/share\/video\/\d+/
+      ];
+      
+      const isValidUrl = douyinPatterns.some(pattern => pattern.test(url));
+      
+      if (!isValidUrl) {
+        showToast('请输入有效的抖音链接', 'error');
+        return;
+      }
+      
+      parseBtn.disabled = true;
+      parseBtn.innerHTML = '<span class="loading-spinner"></span>解析中...';
+      
+      try {
+        const response = await fetch(`${API_BASE}/video/parse`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          currentVideoData = result.data;
+          
+          document.getElementById('videoTitle').textContent = result.data.title || '无标题';
+          
+          if (result.data.cover) {
+            const coverImg = document.getElementById('videoCover');
+            coverImg.src = result.data.cover;
+            coverImg.style.display = 'block';
+            document.getElementById('coverPlaceholder').style.display = 'none';
+          }
+          
+          if (result.data.author?.nickname) {
+            document.getElementById('authorName').textContent = '@' + result.data.author.nickname;
+            
+            if (result.data.author.avatar) {
+              const avatarImg = document.getElementById('authorAvatar');
+              avatarImg.src = result.data.author.avatar;
+              avatarImg.style.display = 'block';
+              document.getElementById('avatarPlaceholder').style.display = 'none';
+            }
+          }
+          
+          if (result.data.statistics) {
+            document.getElementById('diggCount').textContent = formatNumber(result.data.statistics.diggCount || 0);
+            document.getElementById('commentCount').textContent = formatNumber(result.data.statistics.commentCount || 0);
+            document.getElementById('shareCount').textContent = formatNumber(result.data.statistics.shareCount || 0);
+          }
+          
+          document.getElementById('videoDuration').textContent = formatDuration(result.data.duration);
+          document.getElementById('videoCard').classList.add('show');
+          
+          showToast('解析成功！', 'success');
+          
+          await saveToHistory(result.data, url);
+        } else {
+          showToast(result.message || '解析失败，请稍后重试', 'error');
+        }
+      } catch (error) {
+        console.error('Parse error:', error);
+        showToast('连接服务器失败，请检查后端服务', 'error');
+      } finally {
+        parseBtn.disabled = false;
+        parseBtn.innerHTML = '🔍 解析视频';
+      }
+    }
+    
+    async function saveToHistory(videoData, url) {
+      try {
+        await fetch(`${API_BASE}/history`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            videoId: videoData.id,
+            url: url,
+            title: videoData.title,
+            cover: videoData.cover,
+            downloadUrl: videoData.downloadUrl,
+            author: videoData.author?.nickname || ''
+          })
+        });
+      } catch (e) {
+        console.error('Save history error:', e);
+      }
+    }
+    
+    async function loadHistory() {
+      const container = document.querySelector('.container');
+      
+      let historyPage = document.querySelector('.page-history');
+      if (!historyPage) {
+        historyPage = document.createElement('div');
+        historyPage.className = 'page page-history';
+        historyPage.innerHTML = `
+          <div class="card">
+            <div class="page-header">历史记录</div>
+            <div class="stats-card" id="historyStats">
+              <div class="stats-item">
+                <div class="num" id="statsTotal">0</div>
+                <div class="label">全部</div>
+              </div>
+              <div class="stats-item">
+                <div class="num" id="statsToday">0</div>
+                <div class="label">今日</div>
+              </div>
+              <div class="stats-item">
+                <div class="num" id="statsWeek">0</div>
+                <div class="label">本周</div>
+              </div>
+              <div class="stats-item">
+                <div class="num" id="statsMonth">0</div>
+                <div class="label">本月</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div id="historyList"></div>
+          </div>
+          <button class="clear-btn" id="clearHistoryBtn">🗑️ 清空历史记录</button>
+        `;
+        container.appendChild(historyPage);
+        
+        document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+      }
+      
+      historyPage.classList.add('active');
+      
+      try {
+        const [historyRes, statsRes] = await Promise.all([
+          fetch(`${API_BASE}/history`),
+          fetch(`${API_BASE}/history/stats`)
+        ]);
+        
+        const historyResult = await historyRes.json();
+        const statsResult = await statsRes.json();
+        
+        if (statsResult.success) {
+          document.getElementById('statsTotal').textContent = statsResult.data.total;
+          document.getElementById('statsToday').textContent = statsResult.data.today;
+          document.getElementById('statsWeek').textContent = statsResult.data.thisWeek;
+          document.getElementById('statsMonth').textContent = statsResult.data.thisMonth;
+        }
+        
+        const list = document.getElementById('historyList');
+        
+        if (historyResult.success && historyResult.data.length > 0) {
+          list.innerHTML = historyResult.data.map(item => `
+            <div class="history-item" data-url="${item.url}">
+              <div class="history-cover">
+                ${item.cover ? `<img src="${item.cover}" alt="">` : ''}
+              </div>
+              <div class="history-info">
+                <div class="history-title">${item.title || '无标题'}</div>
+                <div class="history-author">@${item.author || '未知'}</div>
+                <div class="history-time">${formatTime(item.createdAt)}</div>
+              </div>
+              <div class="action-icons">
+                <span class="delete-icon" data-id="${item.id}">🗑️</span>
+              </div>
+            </div>
+          `).join('');
+          
+          list.querySelectorAll('.history-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+              if (e.target.classList.contains('delete-icon')) {
+                e.stopPropagation();
+                return;
+              }
+              document.getElementById('urlInput').value = item.dataset.url;
+              switchPage('home');
+              parseVideo();
+            });
+          });
+          
+          list.querySelectorAll('.delete-icon').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              e.stopPropagation();
+              await deleteHistoryItem(btn.dataset.id);
+            });
+          });
+        } else {
+          list.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">📋</div>
+              <div class="empty-text">暂无历史记录</div>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Load history error:', error);
+      }
+    }
+    
+    async function deleteHistoryItem(id) {
+      try {
+        const res = await fetch(`${API_BASE}/history/${id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (result.success) {
+          showToast('已删除', 'success');
+          loadHistory();
+        }
+      } catch (e) {
+        showToast('删除失败', 'error');
+      }
+    }
+    
+    async function clearHistory() {
+      if (!confirm('确定要清空所有历史记录吗？')) return;
+      
+      try {
+        const res = await fetch(`${API_BASE}/history`, { method: 'DELETE' });
+        const result = await res.json();
+        if (result.success) {
+          showToast('已清空', 'success');
+          loadHistory();
+        }
+      } catch (e) {
+        showToast('清空失败', 'error');
+      }
+    }
+    
+    async function loadSettings() {
+      let settingsPage = document.querySelector('.page-settings');
+      if (!settingsPage) {
+        settingsPage = document.createElement('div');
+        settingsPage.className = 'page page-settings';
+        settingsPage.innerHTML = `
+          <div class="card">
+            <div class="page-header">设置</div>
+          </div>
+          <div class="card">
+            <div class="setting-item">
+              <div>
+                <div class="setting-label">自动保存历史</div>
+                <div class="setting-desc">解析后自动记录到历史</div>
+              </div>
+              <input type="checkbox" id="autoSaveCheck" checked>
+            </div>
+          </div>
+          <button class="save-btn" id="saveSettingsBtn">💾 保存设置</button>
+        </div>
+        `;
+        document.querySelector('.container').appendChild(settingsPage);
+        
+        document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+      }
+      
+      settingsPage.classList.add('active');
+    }
+    
+    async function saveSettings() {
+      const autoSave = document.getElementById('autoSaveCheck').checked;
+      
+      try {
+        const res = await fetch(`${API_BASE}/config`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ autoSaveHistory: autoSave })
+        });
+        
+        const result = await res.json();
+        if (result.success) {
+          showToast('保存成功', 'success');
+        } else {
+          showToast('保存失败', 'error');
+        }
+      } catch (e) {
+        showToast('保存失败', 'error');
+      }
+    }
+    
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          document.getElementById('urlInput').value = text;
+          showToast('已粘贴链接', 'success');
+        } else {
+          showToast('剪贴板为空', 'error');
+        }
+      } catch (err) {
+        showToast('请手动粘贴链接', 'error');
+      }
+    }
+    
+    function copyDownloadLink() {
+      if (!currentVideoData) {
+        showToast('请先解析视频', 'error');
+        return;
+      }
+      
+      const link = currentVideoData.downloadUrl || currentVideoData.playUrl || '';
+      if (link) {
+        navigator.clipboard.writeText(link).then(() => {
+          showToast('已复制链接！', 'success');
+        }).catch(() => {
+          const textarea = document.createElement('textarea');
+          textarea.value = link;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          showToast('已复制链接！', 'success');
+        });
+      } else {
+        showToast('无下载链接', 'error');
+      }
+    }
+    
+    function downloadVideo() {
+      if (!currentVideoData) {
+        showToast('请先解析视频', 'error');
+        return;
+      }
+      
+      const link = currentVideoData.downloadUrl || currentVideoData.playUrl || '';
+      if (link) {
+        showToast('正在下载...', '');
+        const proxyUrl = `${API_BASE}/video/proxy-download?url=${encodeURIComponent(link)}`;
+        const a = document.createElement('a');
+        a.href = proxyUrl;
+        a.download = '';
+        a.click();
+        setTimeout(() => showToast('下载完成！', 'success'), 2000);
+      } else {
+        showToast('无下载链接', 'error');
+      }
+    }
+    
+    async function extractText() {
+      if (!currentVideoData) {
+        showToast('请先解析视频', 'error');
+        return;
+      }
+      
+      const videoUrl = currentVideoData.downloadUrl || currentVideoData.playUrl;
+      if (!videoUrl) {
+        showToast('无视频链接', 'error');
+        return;
+      }
+      
+      document.getElementById('extractedText').textContent = '正在提取文字...';
+      document.getElementById('textModal').classList.add('show');
+      
+      try {
+        const res = await fetch(`${API_BASE}/video/speech-to-text`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl: videoUrl })
+        });
+        
+        const result = await res.json();
+        
+        if (result.success && result.data) {
+          document.getElementById('extractedText').textContent = result.data.text || '未能识别到文字';
+        } else {
+          document.getElementById('extractedText').textContent = result.message || '提取失败';
+        }
+      } catch (error) {
+        console.error('STT error:', error);
+        document.getElementById('extractedText').textContent = '提取失败: ' + error.message;
+      }
+    }
+    
+    function shareVideo() {
+      if (!currentVideoData) {
+        showToast('请先解析视频', 'error');
+        return;
+      }
+      
+      const title = currentVideoData.title || '抖音视频';
+      const link = currentVideoData.downloadUrl || window.location.href;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          text: title,
+          url: link
+        }).catch(() => {
+          copyDownloadLink();
+        });
+      } else {
+        copyDownloadLink();
+      }
+    }
+    
+    document.getElementById('pasteBtn').addEventListener('click', pasteFromClipboard);
+    document.getElementById('parseBtn').addEventListener('click', parseVideo);
+    document.getElementById('copyLinkBtn').addEventListener('click', copyDownloadLink);
+    document.getElementById('downloadBtn').addEventListener('click', downloadVideo);
+    document.getElementById('extractBtn').addEventListener('click', extractText);
+    document.getElementById('shareBtn').addEventListener('click', shareVideo);
+    
+    document.getElementById('closeTextModal').addEventListener('click', () => {
+      document.getElementById('textModal').classList.remove('show');
+    });
+    
+    document.getElementById('copyTextBtn').addEventListener('click', () => {
+      const text = document.getElementById('extractedText').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('已复制文字！', 'success');
+      }).catch(() => {
+        showToast('复制失败', 'error');
+      });
+    });
+    
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const page = item.dataset.page;
+        if (page) {
+          switchPage(page);
+        }
+      });
+    });
+    
+    document.getElementById('urlInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        parseVideo();
+      }
+    });
+    
+    loadConfig();
+  </script>
+</body>
+</html>
