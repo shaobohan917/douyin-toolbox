@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      args:
+        - VITE_API_URL=/api
     container_name: douyin-toolbox-frontend
     ports:
       - "5001:80"
