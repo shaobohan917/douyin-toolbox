@@ -24,7 +24,7 @@ services:
     environment:
       - PORT=3000
       - NODE_ENV=production
-      - ALIYUN_API_KEY=${ALIYUN_API_KEY}
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
       - MCP_SERVER_URL=http://mcp:8001
     depends_on:
       - mcp
@@ -39,7 +39,7 @@ services:
       - "5003:8001"
     environment:
       - PORT=8001
-      - ALIYUN_API_KEY=${ALIYUN_API_KEY}
+      - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
     restart: unless-stopped
 
 networks:
