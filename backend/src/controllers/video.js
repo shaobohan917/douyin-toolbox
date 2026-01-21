@@ -6,7 +6,10 @@ const { v4: uuidv4 } = require('uuid');
 class VideoController {
   async parseVideo(ctx, url) {
     try {
-      const parsedData = await this.parseDouyinUrl(url);
+      // Extract clean URL from text (handles Douyin share format)
+      const cleanUrl = this.extractDouyinUrl(url);
+      
+      const parsedData = await this.parseDouyinUrl(cleanUrl);
       
       ctx.body = {
         success: true,
@@ -22,6 +25,12 @@ class VideoController {
         data: null
       };
     }
+  }
+
+  extractDouyinUrl(text) {
+    const urlPattern = /(https?:\/\/(?:v\.douyin\.com|www\.douyin\.com)\/[\w\-\/]+)/;
+    const match = text.match(urlPattern);
+    return match ? match[1] : text;
   }
 
   async parseDouyinUrl(url) {

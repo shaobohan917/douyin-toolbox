@@ -1,6 +1,12 @@
+export const extractDouyinUrl = (text) => {
+  const urlPattern = /(https?:\/\/(?:v\.douyin\.com|www\.douyin\.com)\/[\w\-\/]+)/
+  const match = text.match(urlPattern)
+  return match ? match[1] : text
+}
+
 export const isValidDouyinUrl = (url) => {
   const patterns = [
-    /^https?:\/\/v\.douyin\.com\/\w+/,
+    /^https?:\/\/v\.douyin\.com\/[\w\-]+/,
     /^https?:\/\/www\.douyin\.com\/video\/\d+/,
     /^https?:\/\/www\.douyin\.com\/share\/video\/\d+/,
     /^https?:\/\/www\.douyin\.com\/v\/\d+/,

@@ -185,7 +185,7 @@ class VideoService {
     }
 
     const patterns = [
-      /^https?:\/\/v\.douyin\.com\/\w+/,
+      /^https?:\/\/v\.douyin\.com\/[\w\-]+/,
       /^https?:\/\/www\.douyin\.com\/video\/\d+/,
       /^https?:\/\/www\.douyin\.com\/share\/video\/\d+/,
       /^https?:\/\/www\.douyin\.com\/v\/\d+/,

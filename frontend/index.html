@@ -822,7 +822,13 @@
     let currentVideoData = null;
     let currentPage = 'home';
     let config = { autoSaveHistory: true };
-    
+
+    function extractDouyinUrl(text) {
+      const urlPattern = /(https?:\/\/(?:v\.douyin\.com|www\.douyin\.com)\/[\w\-\/]+)/;
+      const match = text.match(urlPattern);
+      return match ? match[1] : text;
+    }
+
     function showToast(message, type = '') {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -960,22 +966,25 @@
     }
     
     async function parseVideo() {
-      const url = document.getElementById('urlInput').value.trim();
+      let url = document.getElementById('urlInput').value.trim();
       const parseBtn = document.getElementById('parseBtn');
-      
+
       if (!url) {
         showToast('请输入抖音链接', 'error');
         return;
       }
-      
+
+      // Extract clean URL from text
+      url = extractDouyinUrl(url);
+
       const douyinPatterns = [
         /douyin\.com\/share\/video\/\d+/,
         /douyin\.com\/video\/\d+/,
-        /v\.douyin\.com\/\w+/,
+        /v\.douyin\.com\/[\w\-]+/,
         /www\.douyin\.com\/share\/video\/\d+/,
         /iesdouyin\.com\/share\/video\/\d+/
       ];
-      
+
       const isValidUrl = douyinPatterns.some(pattern => pattern.test(url));
       
       if (!isValidUrl) {

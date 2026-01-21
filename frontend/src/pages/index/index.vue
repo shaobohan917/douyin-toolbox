@@ -158,11 +158,12 @@
 <script setup>
 import { ref } from 'vue'
 import { api } from '@/api/index.js'
-import { 
-  isValidDouyinUrl, 
-  showToast, 
-  copyToClipboard, 
-  downloadFile, 
+import {
+  isValidDouyinUrl,
+  extractDouyinUrl,
+  showToast,
+  copyToClipboard,
+  downloadFile,
   shareToWeChat,
   formatNumber,
   formatDuration
@@ -181,7 +182,10 @@ async function parseVideo() {
     return
   }
 
-  if (!isValidDouyinUrl(inputUrl.value)) {
+  // Extract clean URL from text
+  const cleanUrl = extractDouyinUrl(inputUrl.value)
+
+  if (!isValidDouyinUrl(cleanUrl)) {
     error.value = 'Invalid Douyin link. Please check and try again.'
     return
   }
@@ -190,7 +194,7 @@ async function parseVideo() {
   isLoading.value = true
 
   try {
-    const res = await api.parseVideo(inputUrl.value)
+    const res = await api.parseVideo(cleanUrl)
     
     if (res.success) {
       videoData.value = res.data
