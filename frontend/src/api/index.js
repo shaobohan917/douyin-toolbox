@@ -1,4 +1,6 @@
-const BASE_URL = 'http://localhost:3000/api'
+const BASE_URL = process.env.NODE_ENV === 'production'
+  ? '/api'
+  : 'http://localhost:3000/api'
 
 const request = (options) => {
   const token = uni.getStorageSync('access_token') || ''
