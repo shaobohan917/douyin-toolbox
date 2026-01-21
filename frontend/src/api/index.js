@@ -1,11 +1,13 @@
-const BASE_URL = import.meta.env.PROD ? '/api' : 'http://localhost:3000/api'
+const API_BASE_URL = import.meta.env.PROD
+  ? '/api'
+  : (import.meta.env.VITE_API_URL || 'http://localhost:3000/api')
 
 const request = (options) => {
   const token = uni.getStorageSync('access_token') || ''
   
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `${BASE_URL}${options.url}`,
+      url: `${API_BASE_URL}${options.url}`,
       method: options.method || 'GET',
       data: options.data,
       header: {
