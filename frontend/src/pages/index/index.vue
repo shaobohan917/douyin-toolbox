@@ -269,7 +269,7 @@ async function extractText() {
   
   try {
     const configRes = await api.getConfig()
-    const apiKey = configRes.data?.aliyunApiKey
+    const apiKey = configRes.data?.dashscopeApiKey
     
     if (!apiKey) {
       showToast({ title: 'Please configure API key in Settings' })

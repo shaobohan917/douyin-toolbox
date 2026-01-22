@@ -1,34 +1,6 @@
 <template>
   <view class="container">
     <view class="card">
-      <text class="card-title">Alibaba Cloud Bailian API</text>
-      <text class="card-desc">Required for speech-to-text feature</text>
-      
-      <view class="input-group">
-        <text class="input-label">API Key</text>
-        <input 
-          class="input-field" 
-          type="text" 
-          v-model="apiKey" 
-          placeholder="sk-xxxxxxxxxxxx"
-          password
-        />
-      </view>
-      
-      <view class="api-status" :class="{ connected: isApiConnected }">
-        <text>{{ isApiConnected ? '✓ Connected' : '○ Not connected' }}</text>
-      </view>
-      
-      <button 
-        class="save-btn" 
-        :loading="isSaving"
-        @click="saveApiKey"
-      >
-        Save API Key
-      </button>
-    </view>
-
-    <view class="card">
       <text class="card-title">About</text>
       <view class="about-info">
         <view class="info-row">
@@ -79,54 +51,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { showToast } from '@/utils/index.js'
-
-const apiKey = ref('')
-const isApiConnected = ref(false)
-const isSaving = ref(false)
-
-onMounted(() => {
-  loadConfig()
-})
-
-async function loadConfig() {
-  try {
-    const savedKey = uni.getStorageSync('aliyun_api_key')
-    if (savedKey) {
-      apiKey.value = savedKey
-      isApiConnected.value = true
-    }
-  } catch (e) {
-    console.error('Load config error:', e)
-  }
-}
-
-async function saveApiKey() {
-  if (!apiKey.value.trim()) {
-    showToast({ title: 'Please enter API key' })
-    return
-  }
-
-  if (!apiKey.value.startsWith('sk-')) {
-    showToast({ title: 'Invalid API key format' })
-    return
-  }
-
-  isSaving.value = true
-
-  try {
-    uni.setStorageSync('aliyun_api_key', apiKey.value)
-    isApiConnected.value = true
-    showToast({ title: 'Saved successfully!' })
-  } catch (e) {
-    console.error('Save config error:', e)
-    showToast({ title: 'Failed to save', icon: 'none' })
-  } finally {
-    isSaving.value = false
-  }
-}
-
 function contactSupport() {
   uni.showModal({
     title: 'Contact Support',
@@ -135,10 +59,6 @@ function contactSupport() {
     confirmText: 'OK'
   })
 }
-
-defineExpose({
-  loadConfig
-})
 </script>
 
 <style lang="scss" scoped>
@@ -165,55 +85,6 @@ defineExpose({
     color: #999;
     margin-bottom: 24rpx;
     display: block;
-  }
-}
-
-.input-group {
-  margin-bottom: 24rpx;
-  
-  .input-label {
-    font-size: 26rpx;
-    color: #666;
-    margin-bottom: 12rpx;
-    display: block;
-  }
-  
-  .input-field {
-    width: 100%;
-    height: 88rpx;
-    background: #f5f5f5;
-    border-radius: 12rpx;
-    padding: 0 24rpx;
-    font-size: 28rpx;
-    box-sizing: border-box;
-  }
-}
-
-.api-status {
-  padding: 16rpx 24rpx;
-  background: #f5f5f5;
-  border-radius: 8rpx;
-  margin-bottom: 24rpx;
-  font-size: 26rpx;
-  color: #999;
-  
-  &.connected {
-    background: rgba(7, 193, 96, 0.1);
-    color: #07c160;
-  }
-}
-
-.save-btn {
-  width: 100%;
-  height: 88rpx;
-  background: linear-gradient(135deg, #FF2E4D, #FF6B8A);
-  color: #fff;
-  border: none;
-  border-radius: 44rpx;
-  font-size: 30rpx;
-  
-  &:active {
-    opacity: 0.85;
   }
 }
 

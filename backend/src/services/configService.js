@@ -30,9 +30,13 @@ class ConfigService {
     try {
       let config = fs.readJsonSync(this.filePath);
 
-      delete config.aliyunApiKey;
       delete config.openaiApiKey;
       delete config.DOUYIN_API_KEY;
+
+      // 如果配置文件中的 dashscopeApiKey 为空，则从环境变量读取
+      if (!config.dashscopeApiKey && process.env.DASHSCOPE_API_KEY) {
+        config.dashscopeApiKey = process.env.DASHSCOPE_API_KEY;
+      }
 
       if (key) {
         const keys = key.split('.');
@@ -46,7 +50,6 @@ class ConfigService {
       }
 
       const result = { ...config };
-      delete result.aliyunApiKey;
       delete result.openaiApiKey;
       delete result.DOUYIN_API_KEY;
 
@@ -89,7 +92,6 @@ class ConfigService {
 
       config = { ...config, ...updates };
 
-      delete config.aliyunApiKey;
       delete config.openaiApiKey;
       delete config.DOUYIN_API_KEY;
 
@@ -135,27 +137,6 @@ class ConfigService {
       console.error('Delete config error:', error);
       throw new Error('Failed to delete config');
     }
-  }
-
-  async getAliyunApiKey() {
-    const config = await this.get();
-    return config?.aliyunApiKey || '';
-  }
-
-  async setAliyunApiKey(apiKey) {
-    return await this.set('aliyunApiKey', apiKey);
-  }
-
-  async validateAliyunApiKey(apiKey) {
-    if (!apiKey || typeof apiKey !== 'string') {
-      return { valid: false, error: 'API key is required' };
-    }
-
-    if (!apiKey.startsWith('sk-')) {
-      return { valid: false, error: 'Invalid API key format' };
-    }
-
-    return { valid: true };
   }
 
   async exportConfig() {

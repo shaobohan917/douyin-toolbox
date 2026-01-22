@@ -85,7 +85,7 @@ cd ../..
 cp backend/.env.example backend/.env
 
 # Edit .env and add your API key
-# ALIYUN_API_KEY=sk-your-api-key
+# DASHSCOPE_API_KEY=your_api_key_here
 
 # Start the Node.js server
 npm run dev

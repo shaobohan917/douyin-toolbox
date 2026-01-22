@@ -95,7 +95,7 @@ async def get_download_url(request: VideoParseRequest):
 async def extract_video_text(request: TextExtractRequest):
     """Extract text from video using speech recognition"""
     try:
-        api_key = request.api_key or os.getenv("ALIYUN_API_KEY")
+        api_key = request.api_key or os.getenv("DASHSCOPE_API_KEY")
         if not api_key:
             raise HTTPException(status_code=400, detail="API key required")
 

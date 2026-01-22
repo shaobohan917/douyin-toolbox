@@ -26,9 +26,13 @@ class ConfigController {
     try {
       let config = fs.readJsonSync(this.configFile);
 
-      delete config.aliyunApiKey;
       delete config.openaiApiKey;
       delete config.DOUYIN_API_KEY;
+
+      // 如果配置文件中的 dashscopeApiKey 为空，则从环境变量读取
+      if (!config.dashscopeApiKey && process.env.DASHSCOPE_API_KEY) {
+        config.dashscopeApiKey = process.env.DASHSCOPE_API_KEY;
+      }
 
       if (config.dashscopeApiKey) {
         config.dashscopeApiKey = '***';
@@ -56,7 +60,6 @@ class ConfigController {
         ? fs.readJsonSync(this.configFile) 
         : this.defaultConfig;
 
-      delete currentConfig.aliyunApiKey;
       delete currentConfig.openaiApiKey;
       delete currentConfig.DOUYIN_API_KEY;
 
@@ -64,7 +67,6 @@ class ConfigController {
         newConfig.dashscopeApiKey = currentConfig.dashscopeApiKey;
       }
 
-      delete newConfig.aliyunApiKey;
       delete newConfig.openaiApiKey;
       delete newConfig.DOUYIN_API_KEY;
 
