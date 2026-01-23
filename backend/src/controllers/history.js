@@ -121,13 +121,31 @@ class HistoryController {
       const thisWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
       const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
+      // Calculate all stats in a single pass
+      let todayCount = 0;
+      let thisWeekCount = 0;
+      let thisMonthCount = 0;
+      const videoIds = new Set();
+      const authors = new Set();
+
+      for (const item of history) {
+        const createdAt = new Date(item.createdAt);
+        
+        if (createdAt >= today) todayCount++;
+        if (createdAt >= thisWeek) thisWeekCount++;
+        if (createdAt >= thisMonth) thisMonthCount++;
+        
+        videoIds.add(item.videoId);
+        authors.add(item.author);
+      }
+
       const stats = {
         total: history.length,
-        today: history.filter(h => new Date(h.createdAt) >= today).length,
-        thisWeek: history.filter(h => new Date(h.createdAt) >= thisWeek).length,
-        thisMonth: history.filter(h => new Date(h.createdAt) >= thisMonth).length,
-        uniqueVideos: new Set(history.map(h => h.videoId)).size,
-        uniqueAuthors: new Set(history.map(h => h.author)).size
+        today: todayCount,
+        thisWeek: thisWeekCount,
+        thisMonth: thisMonthCount,
+        uniqueVideos: videoIds.size,
+        uniqueAuthors: authors.size
       };
 
       ctx.body = {

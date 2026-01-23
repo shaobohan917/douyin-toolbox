@@ -14,8 +14,6 @@ class ConfigService {
       language: 'zh-CN'
     };
     this.initDataDir();
-  }
-    };
     this.init();
   }
 

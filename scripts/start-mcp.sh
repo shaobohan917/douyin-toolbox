@@ -131,7 +131,7 @@ start_server() {
     cd "${MCP_DIR}"
 
     # 启动服务
-    ${PYTHON_CMD} -m uvicorn server:app --host 0.0.0.0 --port 8000 --reload
+    ${PYTHON_CMD} -m uvicorn server:app --host 0.0.0.0 --port 8001 --reload
 
     log_success "MCP Server stopped"
 }

@@ -1,14 +1,17 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env'), override: true });
+
 const Koa = require('koa');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
 const serve = require('koa-static');
-const path = require('path');
 const fs = require('fs-extra');
 
 const videoRouter = require('./routers/video');
 const historyRouter = require('./routers/history');
 const configRouter = require('./routers/config');
+const { rateLimiter } = require('./middleware');
 
 const app = new Koa();
 const router = new Router();
@@ -22,6 +25,13 @@ app.use(cors({
 app.use(bodyParser({
   jsonLimit: '10mb',
   formLimit: '10mb'
+}));
+
+// Apply rate limiting (100 requests per minute)
+app.use(rateLimiter.create({
+  windowMs: 60000,
+  maxRequests: 100,
+  message: 'Too many requests, please try again later'
 }));
 
 app.use(async (ctx, next) => {
@@ -72,7 +82,7 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/api/health`);
+  console.log(`Health check: http://0.0.0.0:${PORT}/api/health`);
 });
 
 module.exports = app;

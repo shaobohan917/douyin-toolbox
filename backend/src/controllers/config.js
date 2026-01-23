@@ -30,7 +30,7 @@ class ConfigController {
       delete config.DOUYIN_API_KEY;
 
       // 如果配置文件中的 dashscopeApiKey 为空，则从环境变量读取
-      if (!config.dashscopeApiKey && process.env.DASHSCOPE_API_KEY) {
+      if ((!config.dashscopeApiKey || config.dashscopeApiKey.trim() === '') && process.env.DASHSCOPE_API_KEY) {
         config.dashscopeApiKey = process.env.DASHSCOPE_API_KEY;
       }
 

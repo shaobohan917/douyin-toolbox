@@ -2,12 +2,13 @@ const axios = require('axios');
 const fs = require('fs-extra');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { extractDouyinUrl, extractVideoId, removeWatermark } = require('../utils/videoHelper');
 
 class VideoController {
   async parseVideo(ctx, url) {
     try {
       // Extract clean URL from text (handles Douyin share format)
-      const cleanUrl = this.extractDouyinUrl(url);
+      const cleanUrl = extractDouyinUrl(url);
       
       const parsedData = await this.parseDouyinUrl(cleanUrl);
       
@@ -25,12 +26,6 @@ class VideoController {
         data: null
       };
     }
-  }
-
-  extractDouyinUrl(text) {
-    const urlPattern = /(https?:\/\/(?:v\.douyin\.com|www\.douyin\.com)\/[\w\-\/]+)/;
-    const match = text.match(urlPattern);
-    return match ? match[1] : text;
   }
 
   async parseDouyinUrl(url) {
@@ -65,7 +60,7 @@ class VideoController {
       }
     }
     
-    const videoId = this.extractVideoId(targetUrl);
+    const videoId = extractVideoId(targetUrl);
     
     if (!videoId) {
       throw new Error('Invalid Douyin URL: ' + targetUrl);
@@ -116,7 +111,7 @@ class VideoController {
     
     // Extract video info
     const video = data.video;
-    const videoUrl = video.play_addr.url_list[0].replace('playwm', 'play');
+    const videoUrl = removeWatermark(video.play_addr.url_list[0]);
     const desc = (data.desc || '').trim() || `douyin_${videoId}`;
     
     // Clean filename
@@ -149,24 +144,6 @@ class VideoController {
         collectCount: statistics.collect_count || 0
       }
     };
-  }
-
-  extractVideoId(url) {
-    const patterns = [
-      /\/video\/(\d+)/,
-      /\/v\/(\d+)/,
-      /\/share\/video\/(\d+)/,
-      /douyin\.com\/(\d+)/,
-      /iesdouyin\.com\/share\/video\/(\d+)/,
-      /\/note\/(\d+)/
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) return match[1];
-    }
-
-    return null;
   }
 
   async downloadVideo(ctx, url, filename) {
@@ -245,10 +222,10 @@ class VideoController {
   async extractText(ctx, videoUrl, apiKey) {
     try {
       const sttService = require('../services/sttService');
-      
+
       const dashscopeApiKey = apiKey || process.env.DASHSCOPE_API_KEY;
-      
-      if (!dashscopeApiKey) {
+
+      if (!dashscopeApiKey || dashscopeApiKey.trim() === '') {
         throw new Error('请配置环境变量 DASHSCOPE_API_KEY');
       }
 

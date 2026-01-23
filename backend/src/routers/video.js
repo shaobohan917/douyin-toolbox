@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const videoController = require('../controllers/video');
+const { isValidDouyinUrl } = require('../utils/videoHelper');
 
 const router = new Router({ prefix: '/api/video' });
 
@@ -10,6 +11,14 @@ router.post('/parse', async (ctx) => {
     ctx.body = { success: false, message: 'URL is required', data: null };
     return;
   }
+  
+  // Validate Douyin URL format
+  if (!isValidDouyinUrl(url)) {
+    ctx.status = 400;
+    ctx.body = { success: false, message: 'Invalid Douyin URL format', data: null };
+    return;
+  }
+  
   await videoController.parseVideo(ctx, url);
 });
 

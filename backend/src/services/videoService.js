@@ -2,6 +2,7 @@ const axios = require('axios');
 const fs = require('fs-extra');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { extractVideoId, removeWatermark } = require('../utils/videoHelper');
 
 class VideoService {
   constructor() {
@@ -11,36 +12,6 @@ class VideoService {
       'Accept': 'application/json',
       'Accept-Language': 'en-US,en;q=0.9'
     };
-  }
-
-  extractVideoId(url) {
-    const patterns = [
-      /\/video\/(\d+)/,
-      /\/v\/(\d+)/,
-      /\/share\/video\/(\d+)/,
-      /douyin\.com\/(\d+)/,
-      /\/note\/(\d+)/
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) return match[1];
-    }
-
-    return null;
-  }
-
-  removeWatermark(urlList) {
-    if (!urlList || urlList.length === 0) return null;
-
-    let url = urlList[0];
-    if (!url) return null;
-
-    url = url.replace('v.douyin.com', 'www.douyin.com');
-    url = url.replace('/playwm/', '/play/');
-    url = url.replace(/&ratio=720p/, '');
-
-    return url;
   }
 
   async parseVideo(url) {
