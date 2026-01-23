@@ -15,9 +15,16 @@ Douyin Toolbox 是一个跨平台应用，用于解析抖音分享链接、获�
 ### 技术栈
 
 #### 前端
-- **框架**: Uni-app + Vue3 + uView Plus
+- **实际部署**: 静态 HTML 文件（`frontend/index.html`）
+- **框架**: Uni-app + Vue3 + uView Plus（`frontend/src/` 目录，当前未被使用）
 - **跨平台支持**: 微信小程序、Android、iOS、H5
 - **构建工具**: Vite
+
+**⚠️ 重要说明**：
+- 当前生产环境使用的是**静态 HTML 文件**（`frontend/index.html`），包含所有 HTML、CSS、JavaScript
+- `frontend/src/` 目录包含 Uni-app + Vue3 源代码，但**当前未被使用**
+- 修改前端时，应该修改 `frontend/index.html`，而不是 `frontend/src/pages/` 下的 Vue 文件
+- `frontend/src/` 可能是早期开发保留的代码，或用于未来的跨平台支持（微信小程序、App）
 
 #### 后端
 - **API 服务**: Node.js Koa2
@@ -63,11 +70,13 @@ douyin-toolbox/
 │   └── .env                   # 环境变量配置（不提交到 git）
 │
 ├── frontend/                   # 前端应用
-│   ├── src/
+│   ├── index.html             # ⚠️ 静态 HTML 文件（实际部署使用）
+│   ├── src/                   # ⚠️ Uni-app + Vue3 源代码（当前未被使用）
 │   │   ├── pages/             # 页面组件
 │   │   │   ├── index/         # 首页（视频解析）
 │   │   │   ├── history/       # 历史记录页
-│   │   │   └── settings/      # 设置页
+│   │   │   ├── settings/      # 设置页
+│   │   │   └── result/        # 视频结果页
 │   │   ├── api/               # API 调用封装
 │   │   ├── utils/             # 工具函数
 │   │   ├── static/            # 静态资源
