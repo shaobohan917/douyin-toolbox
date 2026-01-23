@@ -68,7 +68,15 @@ export const api = {
       data: { videoUrl, apiKey }
     })
   },
-  
+
+  analyzeVideoContent(videoData) {
+    return request({
+      url: '/video/analyze',
+      method: 'POST',
+      data: videoData
+    })
+  },
+
   getHistory() {
     return request({
       url: '/history',

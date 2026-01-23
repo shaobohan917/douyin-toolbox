@@ -1,11 +1,17 @@
 FROM node:18-alpine
 
+# Install Python 3 and pip
+RUN apk add --no-cache python3 py3-pip
+
 WORKDIR /app
 
 COPY backend/package*.json ./
 RUN npm ci --only=production
 
 COPY backend/ .
+
+# Install Python dependencies for Skills library
+RUN pip3 install --no-cache-dir --break-system-packages pyyaml
 
 EXPOSE 3000
 

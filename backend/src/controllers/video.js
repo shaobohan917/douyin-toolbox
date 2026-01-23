@@ -249,6 +249,36 @@ class VideoController {
       };
     }
   }
+
+  async analyzeVideoContent(ctx, videoData) {
+    try {
+      const skillsService = require('../services/skillsService');
+
+      const { videoId, title, tags, audioText } = videoData;
+
+      if (!videoId || !title) {
+        throw new Error('Video ID and title are required');
+      }
+
+      console.log('Analyzing video content:', { videoId, title: title.substring(0, 50) });
+
+      const result = await skillsService.analyzeVideo(videoId, title, tags, audioText);
+
+      ctx.body = {
+        success: true,
+        message: 'Video analyzed successfully',
+        data: result
+      };
+    } catch (error) {
+      console.error('Analyze video content error:', error);
+      ctx.status = 500;
+      ctx.body = {
+        success: false,
+        message: error.message || 'Failed to analyze video',
+        data: null
+      };
+    }
+  }
 }
 
 module.exports = new VideoController();

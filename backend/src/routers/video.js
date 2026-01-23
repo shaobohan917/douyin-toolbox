@@ -52,4 +52,14 @@ router.get('/proxy-download', async (ctx) => {
   await videoController.proxyDownload(ctx, url);
 });
 
+router.post('/analyze', async (ctx) => {
+  const { videoId, title, tags, audioText } = ctx.request.body;
+  if (!videoId || !title) {
+    ctx.status = 400;
+    ctx.body = { success: false, message: 'Video ID and title are required', data: null };
+    return;
+  }
+  await videoController.analyzeVideoContent(ctx, { videoId, title, tags, audioText });
+});
+
 module.exports = router;

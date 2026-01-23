@@ -403,7 +403,67 @@ async function extractText() {
 }
 
 async function generateSummary() {
-  showToast({ title: 'Summary feature coming soon' })
+  if (!videoData.value) return
+
+  try {
+    uni.showLoading({ title: 'Analyzing...' })
+
+    const res = await api.analyzeVideoContent({
+      videoId: videoData.value.id,
+      title: videoData.value.title,
+      tags: [],
+      audioText: extractedText.value || null
+    })
+
+    uni.hideLoading()
+
+    if (res.success) {
+      const analysis = res.data.analysis
+      let summaryText = ''
+
+      // Build summary from analysis result
+      if (analysis.content_summary) {
+        summaryText += analysis.content_summary + '\n\n'
+      }
+
+      if (analysis.category) {
+        summaryText += `分类: ${analysis.category}\n`
+      }
+
+      if (analysis.sentiment) {
+        const sentimentMap = {
+          'positive': '正向',
+          'negative': '负向',
+          'neutral': '中性'
+        }
+        summaryText += `情感倾向: ${sentimentMap[analysis.sentiment] || analysis.sentiment}\n`
+      }
+
+      if (analysis.keywords && analysis.keywords.length > 0) {
+        summaryText += `关键词: ${analysis.keywords.join(', ')}\n`
+      }
+
+      if (analysis.themes && analysis.themes.length > 0) {
+        summaryText += `主题: ${analysis.themes.join(', ')}\n`
+      }
+
+      if (analysis.key_insights && analysis.key_insights.length > 0) {
+        summaryText += '\n关键要点:\n'
+        analysis.key_insights.forEach((insight, index) => {
+          summaryText += `${index + 1}. ${insight}\n`
+        })
+      }
+
+      extractedText.value = summaryText.trim()
+      showToast({ title: 'Summary generated!' })
+    } else {
+      showToast({ title: res.message || 'Analysis failed' })
+    }
+  } catch (err) {
+    console.error('Analyze error:', err)
+    uni.hideLoading()
+    showToast({ title: 'Failed to analyze video', icon: 'none' })
+  }
 }
 
 async function translateText() {
