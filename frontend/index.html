@@ -775,6 +775,9 @@
             </div>
             <div class="action-row">
               <button class="action-btn outline" id="extractBtn">🤖 AI 提取文字</button>
+              <button class="action-btn outline" id="summaryBtn">📋 AI 摘要</button>
+            </div>
+            <div class="action-row">
               <button class="action-btn outline" id="shareBtn">📤 分享</button>
             </div>
           </div>
@@ -807,7 +810,7 @@
   <div class="modal" id="textModal">
     <div class="modal-content">
       <div class="modal-header">
-        <span class="modal-title">提取的文字</span>
+        <span class="modal-title">AI 结果</span>
         <div class="modal-close" id="closeTextModal">×</div>
       </div>
       <div class="modal-body">
@@ -1318,25 +1321,25 @@
         showToast('请先解析视频', 'error');
         return;
       }
-      
+
       const videoUrl = currentVideoData.downloadUrl || currentVideoData.playUrl;
       if (!videoUrl) {
         showToast('无视频链接', 'error');
         return;
       }
-      
+
       document.getElementById('extractedText').textContent = '正在提取文字...';
       document.getElementById('textModal').classList.add('show');
-      
+
       try {
         const res = await fetch(`${API_BASE}/video/speech-to-text`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ videoUrl: videoUrl })
         });
-        
+
         const result = await res.json();
-        
+
         if (result.success && result.data) {
           document.getElementById('extractedText').textContent = result.data.text || '未能识别到文字';
         } else {
@@ -1345,6 +1348,75 @@
       } catch (error) {
         console.error('STT error:', error);
         document.getElementById('extractedText').textContent = '提取失败: ' + error.message;
+      }
+    }
+
+    async function generateSummary() {
+      if (!currentVideoData) {
+        showToast('请先解析视频', 'error');
+        return;
+      }
+
+      document.getElementById('extractedText').textContent = '正在分析视频内容...';
+      document.getElementById('textModal').classList.add('show');
+
+      try {
+        const res = await fetch(`${API_BASE}/video/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            videoId: currentVideoData.id,
+            title: currentVideoData.title,
+            tags: [],
+            audioText: null
+          })
+        });
+
+        const result = await res.json();
+
+        if (result.success && result.data) {
+          const analysis = result.data.analysis;
+          let summaryText = '';
+
+          if (analysis.content_summary) {
+            summaryText += analysis.content_summary + '\n\n';
+          }
+
+          if (analysis.category) {
+            summaryText += `分类: ${analysis.category}\n`;
+          }
+
+          if (analysis.sentiment) {
+            const sentimentMap = {
+              'positive': '正向',
+              'negative': '负向',
+              'neutral': '中性'
+            };
+            summaryText += `情感倾向: ${sentimentMap[analysis.sentiment] || analysis.sentiment}\n`;
+          }
+
+          if (analysis.keywords && analysis.keywords.length > 0) {
+            summaryText += `关键词: ${analysis.keywords.join(', ')}\n`;
+          }
+
+          if (analysis.themes && analysis.themes.length > 0) {
+            summaryText += `主题: ${analysis.themes.join(', ')}\n`;
+          }
+
+          if (analysis.key_insights && analysis.key_insights.length > 0) {
+            summaryText += '\n关键要点:\n';
+            analysis.key_insights.forEach((insight, index) => {
+              summaryText += `${index + 1}. ${insight}\n`;
+            });
+          }
+
+          document.getElementById('extractedText').textContent = summaryText.trim() || '未能生成摘要';
+        } else {
+          document.getElementById('extractedText').textContent = result.message || '分析失败';
+        }
+      } catch (error) {
+        console.error('Analyze error:', error);
+        document.getElementById('extractedText').textContent = '分析失败: ' + error.message;
       }
     }
     
@@ -1375,6 +1447,7 @@
     document.getElementById('copyLinkBtn').addEventListener('click', copyDownloadLink);
     document.getElementById('downloadBtn').addEventListener('click', downloadVideo);
     document.getElementById('extractBtn').addEventListener('click', extractText);
+    document.getElementById('summaryBtn').addEventListener('click', generateSummary);
     document.getElementById('shareBtn').addEventListener('click', shareVideo);
     
     document.getElementById('closeTextModal').addEventListener('click', () => {
