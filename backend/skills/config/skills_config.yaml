@@ -1,0 +1,150 @@
+# Skills 全局配置文件
+
+# 抖音视频分析配置
+douyin:
+  video_summarizer:
+    # 关键词提取配置
+    keywords:
+      max_count: 10  # 最大关键词数量
+      min_length: 2  # 关键词最小长度
+
+    # 标签提取配置
+    tags:
+      pattern: '#([^#\s]+)'  # 标签正则表达式
+
+    # 停用词列表
+    stop_words:
+      - 的
+      - 了
+      - 是
+      - 在
+      - 和
+      - 与
+      - 或
+      - 但
+      - 这
+      - 那
+      - ！
+      - ：
+      - ，
+      - 。
+
+    # 内容分类配置
+    categories:
+      金融投资:
+        - 白银
+        - 沪银
+        - lof
+        - 基金
+        - 股票
+        - 投资
+        - 大宗商品
+        - 沪铜
+        - 期货
+        - 交易
+      科技数码:
+        - 手机
+        - 电脑
+        - 软件
+        - AI
+        - 人工智能
+        - 科技
+        - 数码
+      生活娱乐:
+        - 美食
+        - 旅游
+        - 健身
+        - 娱乐
+        - 搞笑
+        - 生活
+      教育知识:
+        - 教程
+        - 学习
+        - 知识
+        - 教育
+        - 科普
+      时尚美妆:
+        - 美妆
+        - 时尚
+        - 穿搭
+        - 护肤
+      汽车:
+        - 汽车
+        - 车
+        - 驾驶
+      体育:
+        - 运动
+        - 体育
+        - 健身
+        - 篮球
+        - 足球
+
+    # 情感分析配置
+    sentiment:
+      positive:
+        - 好
+        - 棒
+        - 优秀
+        - 成功
+        - 突破
+        - 上涨
+        - 利好
+        - 推荐
+      negative:
+        - 差
+        - 失败
+        - 下跌
+        - 利空
+        - 风险
+        - 惊魂
+        - 暴跌
+        - 惨
+      neutral:
+        - 分析
+        - 介绍
+        - 说明
+        - 展示
+        - 分享
+
+    # 主题识别配置
+    themes:
+      max_count: 5  # 最大主题数量
+      mapping:
+        白银:
+          - 贵金属
+          - 有色金属
+        沪银:
+          - 期货
+          - 上海期货交易所
+        lof:
+          - 基金
+          - LOF基金
+        大宗商品:
+          - 投资
+          - 商品交易
+        沪铜:
+          - 铜
+          - 有色金属
+
+    # 输出格式配置
+    output:
+      format: json  # 输出格式：json, yaml
+      indent: 2     # 缩进空格数
+      ensure_ascii: false  # 是否确保 ASCII 编码
+
+# 通用配置
+general:
+  # 日志配置
+  logging:
+    level: INFO  # 日志级别：DEBUG, INFO, WARNING, ERROR
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+  # 缓存配置
+  cache:
+    enabled: true
+    ttl: 3600  # 缓存过期时间（秒）
+
+  # 性能配置
+  performance:
+    max_workers: 4  # 最大工作线程数
+    timeout: 30     # 超时时间（秒）
