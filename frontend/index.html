@@ -718,6 +718,13 @@
       font-size: 15px;
       color: #666;
     }
+    
+    .video-player {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
   </style>
 </head>
 <body>
@@ -744,6 +751,7 @@
               <div style="width:0;height:0;border-left:20px solid #fff;border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:4px;"></div>
             </div>
           </div>
+          <video id="videoPlayer" class="video-player" style="display:none;" playsinline controls></video>
           <div class="play-icon"></div>
           <div class="video-duration" id="videoDuration">0:00</div>
         </div>
@@ -830,6 +838,34 @@
       const urlPattern = /(https?:\/\/(?:v\.douyin\.com|www\.douyin\.com)\/[\w\-\/]+)/;
       const match = text.match(urlPattern);
       return match ? match[1] : text;
+    }
+
+    function playVideo() {
+      if (!currentVideoData) {
+        showToast('请先解析视频', 'error');
+        return;
+      }
+
+      const videoPlayer = document.getElementById('videoPlayer');
+      const videoCover = document.getElementById('videoCover');
+      const coverPlaceholder = document.getElementById('coverPlaceholder');
+      const playIcon = document.querySelector('.play-icon');
+
+      const videoUrl = currentVideoData.downloadUrl || currentVideoData.playUrl;
+
+      if (videoUrl) {
+        videoPlayer.src = videoUrl;
+        videoPlayer.style.display = 'block';
+        videoCover.style.display = 'none';
+        coverPlaceholder.style.display = 'none';
+        playIcon.style.display = 'none';
+        videoPlayer.play().catch(err => {
+          console.error('Play error:', err);
+          showToast('播放失败，请稍后重试', 'error');
+        });
+      } else {
+        showToast('视频地址无效', 'error');
+      }
     }
 
     function showToast(message, type = '') {
@@ -1449,7 +1485,11 @@
     document.getElementById('extractBtn').addEventListener('click', extractText);
     document.getElementById('summaryBtn').addEventListener('click', generateSummary);
     document.getElementById('shareBtn').addEventListener('click', shareVideo);
-    
+
+    // 添加播放按钮点击事件
+    document.querySelector('.play-icon').addEventListener('click', playVideo);
+    document.querySelector('.video-cover').addEventListener('click', playVideo);
+
     document.getElementById('closeTextModal').addEventListener('click', () => {
       document.getElementById('textModal').classList.remove('show');
     });
